@@ -12,7 +12,7 @@ class Entity:
     def __repr__(self):
         result = ""
 
-        if (self.alive is True):
+        if self.alive is True:
             result = "X"
         else:
             result = " "

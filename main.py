@@ -4,15 +4,16 @@ import random
 from Entity import Entity
 from time import sleep
 
-''' esempio di stampa della matrice
-|   |   |   |
-| x | x |   |
-|   | x |   |
-'''
+import pygame
 
 
-dimension = 10  # dimenzione della matrice
-amount = 25     # numero di celle vive da spawnare
+col_alive = (255, 255, 215)
+col_background = (10, 10, 40)
+col_grid = (30, 30, 60)
+tempo = 0.01
+cellsize    = 8   # dimensione celle
+dimension   = 120  # dimenzione della matrice
+amount      = 2500  # numero di celle vive da spawnare
 
 
 def init_matrix():    # popola la matrice al primo avvio
@@ -29,11 +30,11 @@ def init_matrix():    # popola la matrice al primo avvio
 
 def print_matrix(matrix: list):  # stampa la matrice in modo leggibile
     print("\n", "-"*59, "\n")
-    for i in matrix:
-        for j in i:
+    for i in range(dimension):
+        for j in range(dimension):
             print(
                 "| ",
-                j,
+                matrix[i][j],
                 " ",
                 end="")
 
@@ -50,7 +51,7 @@ def random_spawn(matrix: np.array, amount: int):
         j = random.randint(0, dimension - 1)
 
         # se la cella scelta è morta la porta in vita
-        if (matrix[i][j].alive) is False:
+        if matrix[i][j].alive is False:
             matrix[i][j].set_alive()
             exit_number += 1
 
@@ -84,15 +85,21 @@ def update_entity_neigh(matrix: np.array):
                     matrix[i][j].neighbour_alive += 1
 
 
-def evolve(matrix: np.array):
+def evolve(matrix: np.array, surface):
     tmp = init_matrix()
 
     for i in range(dimension):
         for j in range(dimension):
+            col = col_background
+
             if matrix[i][j].neighbour_alive == 2 and matrix[i][j].alive:
                 tmp[i][j].set_alive()
+                col = col_alive
             if matrix[i][j].neighbour_alive == 3:
                 tmp[i][j].set_alive()
+                col = col_alive
+
+            pygame.draw.rect(surface, col, (j*cellsize, i*cellsize, cellsize-1, cellsize-1))
 
     return tmp
 
@@ -100,24 +107,56 @@ def evolve(matrix: np.array):
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
+'''
+def to_pyplot(matrix):
+    tmp = np.zeros(dimension*dimension).reshape(dimension, dimension)
+
+    for i in range(dimension):
+        for j in range(dimension):
+            tmp[i][j] = 0 if matrix[i][j].alive is False else 1
+
+    return tmp
+'''
+
+
+def call_all(matrix, surface):
+    for i in range(dimension):
+        for j in range(dimension):
+            if matrix[i][j].alive:
+                col = col_alive
+            else:
+                col = col_background
+
+            pygame.draw.rect(surface, col, (j*cellsize, i*cellsize, cellsize-1, cellsize-1))
+
 
 def main():
+    pygame.init()
+    surface = pygame.display.set_mode((dimension * cellsize, dimension * cellsize))
+    pygame.display.set_caption("Typing Monkeys's Game of Life")
+
     # inizializza la matrice di Entity
     matrix = init_matrix()
 
     # spona celle vive a caso
     random_spawn(matrix, amount)
 
+    surface.fill(col_grid)
+    call_all(matrix, surface)
+    pygame.display.update()
+    sleep(tempo)
     while True:
-        clear()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+
         update_entity_neigh(matrix)
+        surface.fill(col_grid)
+        matrix = evolve(matrix, surface)
 
-        print_matrix(matrix)
-
-        matrix = evolve(matrix)
-
-        sleep(0.5)
-
+        pygame.display.update()
+        sleep(tempo)
 
 if __name__ == "__main__":
     main()
