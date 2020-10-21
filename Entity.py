@@ -13,8 +13,8 @@ class Entity:
         result = ""
 
         if (self.alive is True):
-            result = "x"
+            result = "X"
         else:
             result = " "
-        
+
         return result

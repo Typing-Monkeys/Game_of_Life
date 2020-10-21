@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import random
 from Entity import Entity
+from time import sleep
 
 ''' esempio di stampa della matrice
 |   |   |   |
@@ -87,6 +88,14 @@ def update_entity_neigh(matrix: np.array):
 def evolve(matrix: np.array):
     tmp = init_matrix()
 
+    for i in range(dimension):
+        for j in range(dimension):
+            if matrix[i][j].neighbour_alive == 2 and matrix[i][j].alive:
+                tmp[i][j].set_alive()
+            if matrix[i][j].neighbour_alive == 3:
+                tmp[i][j].set_alive()
+
+    return tmp
 
 
 def main():
@@ -95,15 +104,22 @@ def main():
     # inizializza la matrice
     matrix = init_matrix()
 
-    print_matrix(matrix)
-
-    print("\n", "-"*59, "\n")
+    # print_matrix(matrix)
 
     # spona celle vive a caso
-    random_spawn(matrix, amount)    
-    print_matrix(matrix)
+    random_spawn(matrix, amount)
+    # print_matrix(matrix)
 
-    update_entity_neigh(matrix)
+    while True:
+
+        update_entity_neigh(matrix)
+        print_matrix(matrix)
+        print("\n", "-"*59, "\n")
+        matrix = evolve(matrix)
+
+        # print_matrix(matrix)
+        input()
+        # sleep di 1 secondo
 
 if __name__ == "__main__":
     main()
