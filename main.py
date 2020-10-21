@@ -1,4 +1,4 @@
-import sys
+import os
 import numpy as np
 import random
 from Entity import Entity
@@ -11,7 +11,6 @@ from time import sleep
 '''
 
 
-matrix = None   # matrice di celle vive e morte
 dimension = 10  # dimenzione della matrice
 amount = 25     # numero di celle vive da spawnare
 
@@ -29,6 +28,7 @@ def init_matrix():    # popola la matrice al primo avvio
 
 
 def print_matrix(matrix: list):  # stampa la matrice in modo leggibile
+    print("\n", "-"*59, "\n")
     for i in matrix:
         for j in i:
             print(
@@ -38,6 +38,8 @@ def print_matrix(matrix: list):  # stampa la matrice in modo leggibile
                 end="")
 
         print("|")
+
+    print("\n", "-"*59, "\n")
 
 
 def random_spawn(matrix: np.array, amount: int):
@@ -81,9 +83,6 @@ def update_entity_neigh(matrix: np.array):
                 if matrix[x][y].alive is True:
                     matrix[i][j].neighbour_alive += 1
 
-            # print(matrix[i][j].neighbour_alive)
-            # input()
-
 
 def evolve(matrix: np.array):
     tmp = init_matrix()
@@ -98,28 +97,27 @@ def evolve(matrix: np.array):
     return tmp
 
 
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
+
+
 def main():
-    global matrix
-
-    # inizializza la matrice
+    # inizializza la matrice di Entity
     matrix = init_matrix()
-
-    # print_matrix(matrix)
 
     # spona celle vive a caso
     random_spawn(matrix, amount)
-    # print_matrix(matrix)
 
     while True:
-
+        clear()
         update_entity_neigh(matrix)
+
         print_matrix(matrix)
-        print("\n", "-"*59, "\n")
+
         matrix = evolve(matrix)
 
-        # print_matrix(matrix)
-        input()
-        # sleep di 1 secondo
+        sleep(0.5)
+
 
 if __name__ == "__main__":
     main()
