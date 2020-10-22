@@ -56,7 +56,7 @@ def random_spawn(matrix: np.array, amount: int):
             exit_number += 1
 
 
-def update_entity_neigh(matrix: np.array):
+def evolve(matrix: np.array, surface):
     # data un determinata cella restituisce le celle vicine
     def get_neigh(x, y):
         # presa da https://stackoverflow.com/questions/1620940/determining-neighbours-of-cell-two-dimensional-list
@@ -69,29 +69,25 @@ def update_entity_neigh(matrix: np.array):
                         -1 < y <= dimension - 1 and
                         (x != x2 or y != y2) and
                         (0 <= x2 <= dimension - 1) and
-                            (0 <= y2 <= dimension - 1))
+                        (0 <= y2 <= dimension - 1))
             ]
 
-    # controlla ogni cella della matrice
-    # e ne aggiorna il numero di vicini vivi
-    for i in range(dimension):
-        for j in range(dimension):
-            # prende i vicini della cella
-            neght = get_neigh(i, j)
-
-            # controlla se i vicini sono vivi
-            for x, y in neght:
-                if matrix[x][y].alive is True:
-                    matrix[i][j].neighbour_alive += 1
-
-
-def evolve(matrix: np.array, surface):
     tmp = init_matrix()
 
     for i in range(dimension):
         for j in range(dimension):
             col = col_background
 
+            # -- aggiorna i vicini della cella attuale -- #
+            neight = get_neigh(i, j)
+
+            # controlla se i vicini sono vivi
+            for x, y in neight:
+                if matrix[x][y].alive is True:
+                    matrix[i][j].neighbour_alive += 1
+            # -------------------- #
+
+            # evolve la cella attuale
             if matrix[i][j].neighbour_alive == 2 and matrix[i][j].alive:
                 tmp[i][j].set_alive()
                 col = col_alive
@@ -99,6 +95,7 @@ def evolve(matrix: np.array, surface):
                 tmp[i][j].set_alive()
                 col = col_alive
 
+            # stampa graficamente la cella attuale
             pygame.draw.rect(surface, col, (j*cellsize, i*cellsize, cellsize-1, cellsize-1))
 
     return tmp
@@ -106,17 +103,6 @@ def evolve(matrix: np.array, surface):
 
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
-
-'''
-def to_pyplot(matrix):
-    tmp = np.zeros(dimension*dimension).reshape(dimension, dimension)
-
-    for i in range(dimension):
-        for j in range(dimension):
-            tmp[i][j] = 0 if matrix[i][j].alive is False else 1
-
-    return tmp
-'''
 
 
 def call_all(matrix, surface):
@@ -151,12 +137,12 @@ def main():
                 pygame.quit()
                 return
 
-        update_entity_neigh(matrix)
         surface.fill(col_grid)
         matrix = evolve(matrix, surface)
 
         pygame.display.update()
         sleep(tempo)
+
 
 if __name__ == "__main__":
     main()
