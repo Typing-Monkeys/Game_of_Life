@@ -3,7 +3,7 @@
 [The Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life), based on the idea of Jhon Conway.
 
 
-[Game of life gif](imgs/Game_of_life.gif)
+![Game of life gif](imgs/Game_of_life.gif)
 
 ## Installation
 
