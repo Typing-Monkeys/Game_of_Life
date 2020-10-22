@@ -144,12 +144,12 @@ def main():
 
     # spona celle vive a caso
     random_spawn(matrix, amount)
-
+    input()
     # mostra a video la prima generazione della matrice
     show_first_gen(matrix, surface)
 
     sleep(tempo)
-
+    
     # evolve la matrice
     while True:
         for event in pygame.event.get():
