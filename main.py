@@ -1,24 +1,25 @@
 import os
-import numpy as np
 import random
+import pygame
+import numpy as np
 from Entity import Entity
 from time import sleep
 
-import pygame
 
-
-col_alive = (255, 255, 215)
-col_background = (10, 10, 40)
-col_grid = (30, 30, 60)
-tempo = 0.01
-cellsize    = 8   # dimensione celle
+# variabili per la matrice
 dimension   = 120  # dimenzione della matrice
-amount      = 2500  # numero di celle vive da spawnare
+amount      = 4000  # numero di celle vive da spawnare
+tempo       = 0.01
+
+# colori per l'interfaccia grafica
+cellsize    = 8   # dimensione celle
+col_alive   = (255, 255, 215)
+col_grid    = (30, 30, 60)
+col_background = (10, 10, 40)
 
 
-def init_matrix():    # popola la matrice al primo avvio
-    ## -- Migliorare con un Inline for -- ##
-
+# genera una nuova matrice
+def init_matrix() -> np.array:
     # crea un array con tutti gli elementi che poi verrà ridimenzionato
     # a creare una matrice
     tmp = []
@@ -28,7 +29,8 @@ def init_matrix():    # popola la matrice al primo avvio
     return np.array(tmp).reshape((dimension, dimension))
 
 
-def print_matrix(matrix: list):  # stampa la matrice in modo leggibile
+# stampa la matrice in modo leggibile
+def print_matrix(matrix: np.array):
     print("\n", "-"*59, "\n")
     for i in range(dimension):
         for j in range(dimension):
@@ -43,6 +45,8 @@ def print_matrix(matrix: list):  # stampa la matrice in modo leggibile
     print("\n", "-"*59, "\n")
 
 
+# funzione per generare casualmente un set di
+# Entity vive iniziale
 def random_spawn(matrix: np.array, amount: int):
     exit_number = 0
     while exit_number < amount:
@@ -56,7 +60,8 @@ def random_spawn(matrix: np.array, amount: int):
             exit_number += 1
 
 
-def evolve(matrix: np.array, surface):
+# funzione per evolvere la matrice
+def evolve(matrix: np.array, surface: pygame.surface) -> np.array:
     # data un determinata cella restituisce le celle vicine
     def get_neigh(x, y):
         # presa da https://stackoverflow.com/questions/1620940/determining-neighbours-of-cell-two-dimensional-list
@@ -72,6 +77,7 @@ def evolve(matrix: np.array, surface):
                         (0 <= y2 <= dimension - 1))
             ]
 
+    # matrice temporanea
     tmp = init_matrix()
 
     for i in range(dimension):
@@ -101,11 +107,18 @@ def evolve(matrix: np.array, surface):
     return tmp
 
 
+# pulisce lo schermo
+# il comando cambia in base al OS
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def call_all(matrix, surface):
+# funzione per mostrare la prima generazione della matrice
+def show_first_gen(matrix: np.array, surface: pygame.surface):
+    # stampa la griglia della matrice
+    surface.fill(col_grid)
+
+    # colora tutte le celle in base al loro stato
     for i in range(dimension):
         for j in range(dimension):
             if matrix[i][j].alive:
@@ -113,10 +126,15 @@ def call_all(matrix, surface):
             else:
                 col = col_background
 
+            # stampa la cella corrente
             pygame.draw.rect(surface, col, (j*cellsize, i*cellsize, cellsize-1, cellsize-1))
+
+    # aggiorna la finestra
+    pygame.display.update()
 
 
 def main():
+    # inizializza pygame e il display
     pygame.init()
     surface = pygame.display.set_mode((dimension * cellsize, dimension * cellsize))
     pygame.display.set_caption("Typing Monkeys's Game of Life")
@@ -127,20 +145,27 @@ def main():
     # spona celle vive a caso
     random_spawn(matrix, amount)
 
-    surface.fill(col_grid)
-    call_all(matrix, surface)
-    pygame.display.update()
+    # mostra a video la prima generazione della matrice
+    show_first_gen(matrix, surface)
+
     sleep(tempo)
+
+    # evolve la matrice
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
 
+        # stampa la griglia della matrice
         surface.fill(col_grid)
+
+        # evolve la matrice
         matrix = evolve(matrix, surface)
 
+        # aggiorna la finestra
         pygame.display.update()
+
         sleep(tempo)
 
 

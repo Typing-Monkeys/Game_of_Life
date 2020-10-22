@@ -1,3 +1,4 @@
+# Classe che rappresenta la singola cella (Entity) della matrice
 class Entity:
     def __init__(self):
         self.alive = False
