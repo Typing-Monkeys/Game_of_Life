@@ -13,9 +13,9 @@ tempo       = 0.01
 
 # colori per l'interfaccia grafica
 cellsize    = 8   # dimensione celle
-col_alive   = (255, 255, 215)
-col_grid    = (30, 30, 60)
-col_background = (10, 10, 40)
+col_alive   = (255, 255, 0)
+col_grid    = (0, 0, 0)
+col_background = (135, 0, 255)
 
 
 # genera una nuova matrice
@@ -144,12 +144,12 @@ def main():
 
     # spona celle vive a caso
     random_spawn(matrix, amount)
-    input()
+
     # mostra a video la prima generazione della matrice
     show_first_gen(matrix, surface)
 
     sleep(tempo)
-    
+
     # evolve la matrice
     while True:
         for event in pygame.event.get():
